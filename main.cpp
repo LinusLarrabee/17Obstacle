@@ -15,33 +15,36 @@ int main(int argc, const char * argv[]) {
     ifstream fin("17Obstacle.in");
     ofstream fout("17Obstacle.out");
     
-    long double r0,Xita0,VO,VF,Beta,R;
-    fin >> r0 >> Xita0 >> VO >> VF >> Beta >>R;
+    long double r0,Xita0,VO,VF,Beta,R,fay;
+    fin >> r0 >> Xita0 >> VO >> VF >> Beta >>R>>fay;
     long double u, v, p, A,AP,Epxinon,EP;
     long double alpha[3][3];
     
-    p = R/sqrt(r0*r0-R*R);
+    p = tan(fay/2);
+    if (p<0) {
+        p = -p;
+    }
     u = Beta - Xita0;
     v = VO/VF;
     A = (p*cos(u)+sin(u))/sqrt(p*p+1);
     AP = (p*cos(u)-sin(u))/sqrt(p*p+1);
     Epxinon = asin(p/sqrt(p*p+1));
     EP = π - Epxinon;
-
+    
     if (cos(u)/v >= 1){
-    	//N1 is null
+        alpha[0][0] = -4;//N1 is null
     }
     else if (cos(u)/v <= -1){
-    	//0 to 2π
+        alpha[0][0] = 4;//0 to 2π
     }
     else {
         alpha[0][1] = acos(cos(u)/v);
-    	alpha[0][0] = -alpha[0][1];
+        alpha[0][0] = -alpha[0][1];
     }
-
+    
     if (A/v>1)
     {
-    	/* N21 is null */
+        alpha[1][0] = -4;/* N21 is null */
     }
     else if ((A/v) >= 0 && (A/v) <= 1)
     {
@@ -50,35 +53,35 @@ int main(int argc, const char * argv[]) {
     }
     else if ((A/v) >= -1 && (A/v) <= 0)
     {
-    	alpha[1][0] = asin(A/v) - Epxinon;
-    	alpha[1][1] = -π - asin(A/v) - Epxinon;
-    	alpha[1][2] = 1;
+        alpha[1][0] = asin(A/v) - Epxinon;
+        alpha[1][1] = -π - asin(A/v) - Epxinon;
+        alpha[1][2] = 1;//外包
     }
     else
     {
-    	/* 0 to 2π */
+        alpha[1][0] = 4;/* 0 to 2π */
     }
-
+    
     if (AP/v>1)
     {
-    	/* N22 is null */
+        alpha[2][0] = -4;/* N22 is null */
     }
     else if ((AP/v) >= 0 && (AP/v) <= 1)
     {
-    	alpha[2][0] = asin(AP/v) - EP;
-    	alpha[2][1] = π - asin(AP/v) - EP;
+        alpha[2][0] = asin(AP/v) - EP;
+        alpha[2][1] = π - asin(AP/v) - EP;
     }
     else if ((AP/v) >= -1 && (AP/v) <= 0)
     {
-    	alpha[2][0] = asin(AP/v) - EP;
-    	alpha[2][1] = -π - asin(AP/v) - EP;
-    	alpha[2][2] = 1;
+        alpha[2][0] = asin(AP/v) - EP;
+        alpha[2][1] = -π - asin(AP/v) - EP;
+        alpha[2][2] = 1;//外包
     }
     else
     {
-    	/* 0 to 2π */
+        alpha[2][0] = 4;/* 0 to 2π */
     }
-
+    
     if (A/v >1 || AP/v >1)
     {
         alpha[1][2] = -1;
@@ -89,8 +92,8 @@ int main(int argc, const char * argv[]) {
     }
     if (A/v >-1 && A/v <=1 && AP/v >-1 && AP/v <=1)
     {
-    	if (v>1 && Epxinon >=k)
-    	{
+        if (v>1 && Epxinon >=k)
+        {
             alpha[1][1] = alpha[2][1];
             alpha[0][2] = 1;//只考虑前两行
         }
@@ -105,11 +108,11 @@ int main(int argc, const char * argv[]) {
     }
     if (A/v <=-1 && AP/v >-1 && AP/v<=1)
     {
-        alpha[0][2] = 3;//只考虑N21
+        alpha[0][2] = 3;//只考虑N22
     }
     if (AP/v <=-1 && A/v >-1 && A/v<=1)
     {
-        alpha[0][2] = 4;//只考虑N22
+        alpha[0][2] = 4;//只考虑N21
     }
     if (AP/v <=-1 && A/v<=-1)
     {
